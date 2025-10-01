@@ -7,6 +7,7 @@ export const telegramLinks = new Map<number, {
   brokerUserId: number;
   username: string | null;
   name: string;
+  chatId: number;
   linkedAt: string;
 }>();
 

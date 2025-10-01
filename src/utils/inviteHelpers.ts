@@ -32,6 +32,7 @@ export function markInviteUsed(code: string, telegramUserId: number) {
 
 export async function linkTelegramToBroker(ctx: any, code: string) {
   const from = ctx.from || {};
+  const chatId: number = ctx.chat?.id; // <— Chat ID used for messaging
   const telegramUserId: number = from.id;
   const username: string | null = from.username || null;
   const name = `${from.first_name || ""} ${from.last_name || ""}`.trim();
@@ -51,12 +52,15 @@ export async function linkTelegramToBroker(ctx: any, code: string) {
   }
 
   markInviteUsed(code, telegramUserId);
+
   telegramLinks.set(telegramUserId, {
     brokerUserId: rec.brokerUserId,
     username,
     name,
+    chatId,
     linkedAt: new Date().toISOString()
   });
 
   return ctx.reply(`✅ Linked successfully! Broker user ${rec.brokerUserId} is now connected.`);
 }
+

@@ -17,16 +17,34 @@ router.post("/generate-invite", (req, res) => {
 // Admin: forward an order to a broker
 router.post("/forward-order", async (req, res) => {
   const { orderId, brokerUserId, details } = req.body;
-  if (!orderId || !brokerUserId || !details) return res.status(400).json({ error: "Missing fields" });
 
-  const linkEntry = Array.from(telegramLinks.values()).find(l => l.brokerUserId === brokerUserId);
-  if (!linkEntry) return res.status(404).json({ error: "Broker not linked" });
+  // Find the telegram link by brokerUserId
+  const telegramEntry = Array.from(telegramLinks.values()).find(
+    (l) => l.brokerUserId === brokerUserId
+  );
 
-  const order = { orderId, brokerUserId, status: "pending" as const, details };
-  orders.set(orderId, order);
+  if (!telegramEntry) {
+    return res.status(404).json({ success: false, error: "Broker not linked with Telegram" });
+  }
 
-  await bot.telegram.sendMessage(linkEntry.brokerUserId, `📥 New Order ${orderId}\nDetails: ${details}\nUse /orderaccept ${orderId} or /orderreject ${orderId}`);
-  res.json({ success: true, order });
+  try {
+    await bot.telegram.sendMessage(
+      telegramEntry.chatId, // ✅ use chatId saved during linking
+      `📦 New Order\nID: ${orderId}\nDetails: ${details}`
+    );
+
+    orders.set(orderId, {
+      orderId,
+      brokerUserId,
+      status: "pending",
+      details,
+    });
+
+    res.json({ success: true, orderId, brokerUserId });
+  } catch (err: any) {
+    console.error("Error forwarding order:", err.message);
+    res.status(400).json({ success: false, error: err.message });
+  }
 });
 
 // View active links

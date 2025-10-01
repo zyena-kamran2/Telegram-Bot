@@ -23,7 +23,7 @@ export function registerBotCommands(bot: Telegraf) {
   });
 
   bot.command("help", async (ctx) => {
-    return ctx.reply("🤖 Commands:\n/start <CODE>\n/accepttoken <CODE>\n/status\n/orderinfo <ORDER_ID>\n/orderaccept <ORDER_ID>\n/orderreject <ORDER_ID>");
+    return ctx.reply("🤖 Commands:\n/start \n/accepttoken <CODE>\n/status\n/orderinfo <ORDER_ID>\n/orderaccept <ORDER_ID>\n/orderreject <ORDER_ID>");
   });
 
   bot.command("status", async (ctx) => {
